@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+    <title>To-Do List & Task Management | Famral Tasks</title>
+    <link rel="icon" type="image/x-icon" href="https://www.famral.com/favicon.png"/>
+    <!-- Corrected Font Awesome stylesheet link -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: hsl(248, 100%, 98%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 40vh;
+            margin: 0;
+        }
+
+        .main-container {
+            background-color: hsl(248, 100%, 98%);
+            border-radius: 10px;
+            width: 600px;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #0059ff;
+        }
+
+        .task-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .task {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background-color: #ffffff;
+            border: 1px solid #c2c9ff;
+            border-radius: 10px;
+            margin: 10px 0;
+            transition: background-color 0.2s;
+        }
+
+        .task:hover {
+            background-color: #eff1ff;
+            border: 2px solid #b7bfff;
+        }
+
+        .task button {
+            background-color: #f44336;
+            color: rgb(255, 255, 255);
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+
+        .completed {
+            background-color: #ebebeb;
+            color: #acacac;
+        }
+
+        .completed:hover {
+            background-color: #e9e9e9;
+            border: 2px solid #c4c4c4;
+        }
+
+        input[type="text"] {
+            width: 80%;
+            padding: 10px;
+            border: 2px solid #828fff;
+            border-radius: 10px;
+        }
+
+        .task-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        button.add-button {
+            width: 20%;
+            background-color: #3b5fff;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        button.add-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-container">
+        <h1>Tasks & To-Do List</h1>
+        <div class="task-actions">
+            <input type="text" id="task" placeholder="Add a new task">
+            <button class="add-button" onclick="addTask()"><i class="fas fa-plus"></i></button>
+        </div> <br>
+        <ul class="task-list" id="taskList">
+        </ul>
+    </div>
+
+    <script>
+        const taskList = document.getElementById('taskList');
+        const taskInput = document.getElementById('task');
+
+        // Function to add a new task
+        function addTask() {
+            const taskText = taskInput.value;
+            if (taskText.trim() !== '') {
+                const taskElement = document.createElement('li');
+                taskElement.className = 'task';
+                taskElement.innerHTML = `
+                    <span>${taskText}</span>
+                    <div class="task-actions">
+                        <button class="complete-button" onclick="completeTask(this)"><i class="fas fa-check"></i></button>
+                        <button class="delete-button" onclick="deleteTask(this)"><i class="fas fa-trash-alt"></i></button>
+                    </div>
+                `;
+                taskList.appendChild(taskElement);
+                taskInput.value = '';
+                updateLocalStorage();
+            }
+        }
+
+        // Function to mark a task as complete
+        function completeTask(button) {
+            const taskElement = button.parentElement.parentElement;
+            taskElement.classList.toggle('completed');
+            updateLocalStorage();
+        }
+
+        // Function to delete a task
+        function deleteTask(button) {
+            const taskElement = button.parentElement.parentElement;
+            taskElement.remove();
+            updateLocalStorage();
+        }
+
+        // Function to update tasks in local storage
+        function updateLocalStorage() {
+            const tasks = Array.from(taskList.children).map(task => {
+                return {
+                    text: task.querySelector('span').textContent,
+                    completed: task.classList.contains('completed')
+                };
+            });
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+        }
+
+        // Function to load tasks from local storage
+        function loadTasksFromLocalStorage() {
+            const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+            tasks.forEach(task => {
+                const taskElement = document.createElement('li');
+                taskElement.className = 'task';
+                taskElement.innerHTML = `
+                    <span>${task.text}</span>
+                    <div class="task-actions">
+                        <button class="complete-button" onclick="completeTask(this)"><i class="fas fa-check"></i></button>
+                        <button class="delete-button" onclick="deleteTask(this)"><i class="fas fa-trash-alt"></i></button>
+                    </div>
+                `;
+                if (task.completed) {
+                    taskElement.classList.add('completed');
+                }
+                taskList.appendChild(taskElement);
+            });
+        }
+
+        // Load tasks from local storage when the page loads
+        loadTasksFromLocalStorage();
+    </script>
+</body>
+</ht
